@@ -1,0 +1,9 @@
+{
+    "files.associations": {
+        "lv_port_disp_template.h": "c",
+        "lvgl.h": "c",
+        "lv_port_disp.h": "c",
+        "lv_examples.h": "c",
+        "lv_example_widgets.h": "c"
+    }
+}
