@@ -21,44 +21,43 @@ Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.8.0
 Dialog DLL:      TCM.DLL V1.46.0.0
  
 <h2>Project:</h2>
-C:\Users\L\Desktop\lvgl_stm32\USER\LED.uvprojx
-Project File Date:  09/20/2023
+C:\Users\L\Desktop\gittest\lvgl_stm32\USER\LED.uvprojx
+Project File Date:  10/08/2023
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'LED'
-compiling lv_port_indev.c...
-..\lvgl\examples\porting\lv_port_indev.c(84): warning:  #177-D: variable "indev_drv"  was declared but never referenced
-      static lv_indev_drv_t indev_drv;
-..\lvgl\examples\porting\lv_port_indev.c(183): warning:  #177-D: function "touchpad_init"  was declared but never referenced
-  static void touchpad_init(void)
-..\lvgl\examples\porting\lv_port_indev.c(189): warning:  #177-D: function "touchpad_read"  was declared but never referenced
-  static void touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
-..\lvgl\examples\porting\lv_port_indev.c(230): warning:  #177-D: function "mouse_init"  was declared but never referenced
-  static void mouse_init(void)
-..\lvgl\examples\porting\lv_port_indev.c(236): warning:  #177-D: function "mouse_read"  was declared but never referenced
-  static void mouse_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
-..\lvgl\examples\porting\lv_port_indev.c(272): warning:  #177-D: function "keypad_init"  was declared but never referenced
-  static void keypad_init(void)
-..\lvgl\examples\porting\lv_port_indev.c(278): warning:  #177-D: function "keypad_read"  was declared but never referenced
-  static void keypad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
-..\lvgl\examples\porting\lv_port_indev.c(331): warning:  #177-D: function "encoder_init"  was declared but never referenced
-  static void encoder_init(void)
-..\lvgl\examples\porting\lv_port_indev.c(337): warning:  #177-D: function "encoder_read"  was declared but never referenced
-  static void encoder_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
-..\lvgl\examples\porting\lv_port_indev.c(345): warning:  #177-D: function "encoder_handler"  was declared but never referenced
-  static void encoder_handler(void)
-..\lvgl\examples\porting\lv_port_indev.c(358): warning:  #177-D: function "button_init"  was declared but never referenced
-  static void button_init(void)
-..\lvgl\examples\porting\lv_port_indev.c(364): warning:  #177-D: function "button_read"  was declared but never referenced
-  static void button_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
-..\lvgl\examples\porting\lv_port_indev.c: 12 warnings, 0 errors
-compiling stm32f10x_it.c...
-compiling main.c...
-linking...
-Program Size: Code=190516 RO-data=30160 RW-data=576 ZI-data=48408  
-FromELF: creating hex file...
-"..\OBJ\LED.axf" - 0 Error(s), 12 Warning(s).
+compiling xpt2046_lcd.c...
+..\HARDWARE\LCD\xpt2046_lcd.h(57): warning:  #1-D: last line of file ends without a newline
+  #endif /* XPT2046_H */
+..\HARDWARE\LCD\xpt2046_lcd.c(36): warning:  #1295-D: Deprecated declaration xpt2048_is_touch_detected - give arg types
+  static xpt2046_touch_detect_t xpt2048_is_touch_detected();
+..\HARDWARE\LCD\xpt2046_lcd.c(58): warning:  #223-D: function "ESP_LOGI" declared implicitly
+      ESP_LOGI(TAG, "XPT2046 Initialization");
+..\HARDWARE\LCD\xpt2046_lcd.c(91): error:  #18: expected a ")"
+          x = xpt2046_cmd(CMD_X_READ);
+..\HARDWARE\LCD\xpt2046_lcd.c(92): error:  #18: expected a ")"
+          y = xpt2046_cmd(CMD_Y_READ);
+..\HARDWARE\LCD\xpt2046_lcd.c(93): warning:  #223-D: function "ESP_LOGI" declared implicitly
+          ESP_LOGI(TAG, "P(%d,%d)", x, y);
+..\HARDWARE\LCD\xpt2046_lcd.c(153): warning:  #223-D: function "tp_spi_read_reg" declared implicitly
+      tp_spi_read_reg(cmd, data, 2);
+..\HARDWARE\LCD\xpt2046_lcd.c(167): error:  #20: identifier "CONFIG_LV_TOUCH_X_MIN" is undefined
+      if((*x) > XPT2046_X_MIN)(*x) -= XPT2046_X_MIN;
+..\HARDWARE\LCD\xpt2046_lcd.c(170): error:  #20: identifier "CONFIG_LV_TOUCH_Y_MIN" is undefined
+      if((*y) > XPT2046_Y_MIN)(*y) -= XPT2046_Y_MIN;
+..\HARDWARE\LCD\xpt2046_lcd.c(174): error:  #20: identifier "CONFIG_LV_TOUCH_X_MAX" is undefined
+             (XPT2046_X_MAX - XPT2046_X_MIN);
+..\HARDWARE\LCD\xpt2046_lcd.c(174): error:  #20: identifier "CONFIG_LV_TOUCH_X_MIN" is undefined
+             (XPT2046_X_MAX - XPT2046_X_MIN);
+..\HARDWARE\LCD\xpt2046_lcd.c(177): error:  #20: identifier "CONFIG_LV_TOUCH_Y_MAX" is undefined
+             (XPT2046_Y_MAX - XPT2046_Y_MIN);
+..\HARDWARE\LCD\xpt2046_lcd.c(177): error:  #20: identifier "CONFIG_LV_TOUCH_Y_MIN" is undefined
+             (XPT2046_Y_MAX - XPT2046_Y_MIN);
+..\HARDWARE\LCD\xpt2046_lcd.c(216): warning:  #1-D: last line of file ends without a newline
+  }
+..\HARDWARE\LCD\xpt2046_lcd.c: 6 warnings, 8 errors
+"..\OBJ\LED.axf" - 8 Error(s), 6 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -71,7 +70,8 @@ Package Vendor: Keil
   D:\Keil_v5\Keil\STM32F1xx_DFP\2.4.0\Device\Include
 
 <h2>Collection of Component Files used:</h2>
-Build Time Elapsed:  00:00:02
+Target not created.
+Build Time Elapsed:  00:00:01
 </pre>
 </body>
 </html>

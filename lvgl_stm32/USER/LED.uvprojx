@@ -419,24 +419,19 @@
               <FilePath>..\HARDWARE\FLASH\flash.c</FilePath>
             </File>
             <File>
-              <FileName>flash.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\HARDWARE\FLASH\flash.h</FilePath>
-            </File>
-            <File>
               <FileName>spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\SPI\spi.c</FilePath>
             </File>
             <File>
-              <FileName>spi.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\HARDWARE\SPI\spi.h</FilePath>
-            </File>
-            <File>
               <FileName>ILI93xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\LCD\ILI93xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>xpt2046_lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\LCD\xpt2046_lcd.c</FilePath>
             </File>
           </Files>
         </Group>
