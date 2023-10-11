@@ -1092,7 +1092,7 @@ void LCD_Init(void)
         
         LCD_WR_REG(0x29); // display on
     }
-    LCD_Display_Dir(1); // 默认为竖屏	
+    LCD_Display_Dir(1);	
     LCD_Clear(WHITE);
 }
 // 清屏函数

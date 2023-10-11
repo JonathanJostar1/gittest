@@ -15,7 +15,7 @@
   ******************************************************************************
   */
   
-#include "flash.h"
+#include "spi_flash.h"
 
 static __IO uint32_t  SPITimeout = SPIT_LONG_TIMEOUT;    
 static uint16_t SPI_TIMEOUT_UserCallback(uint8_t errorCode);
@@ -29,14 +29,13 @@ void SPI_FLASH_Init(void)
 {
   SPI_InitTypeDef  SPI_InitStructure;
   GPIO_InitTypeDef GPIO_InitStructure;
-	
-	/* 使能SPI时钟 */
-	FLASH_SPI_APBxClock_FUN ( FLASH_SPI_CLK, ENABLE );
-	
-	/* 使能SPI引脚相关的时钟 */
- 	FLASH_SPI_CS_APBxClock_FUN ( FLASH_SPI_CS_CLK|FLASH_SPI_SCK_CLK|
-																	FLASH_SPI_MISO_PIN|FLASH_SPI_MOSI_PIN, ENABLE );
-	
+    
+    /* 使能SPI时钟 */
+    FLASH_SPI_APBxClock_FUN ( FLASH_SPI_CLK, ENABLE );
+    
+    /* 使能SPI引脚相关的时钟 */
+    FLASH_SPI_CS_APBxClock_FUN ( FLASH_SPI_CS_CLK|FLASH_SPI_SCK_CLK|FLASH_SPI_MISO_PIN|FLASH_SPI_MOSI_PIN, ENABLE );
+    
   /* 配置SPI的 CS引脚，普通IO即可 */
   GPIO_InitStructure.GPIO_Pin = FLASH_SPI_CS_PIN;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;

@@ -36,7 +36,8 @@ extern "C" {
 #endif
 
 /*Default display refresh, input device read and animation step period.*/
-#define LV_DEF_REFR_PERIOD  33      /*[ms]*/
+#define LV_DEF_REFR_PERIOD        30      /*[ms]*/
+#define LV_DEF_INPUT_REFR_PERIOD  10      /*[ms]*/
 
 /**********************
  *      TYPEDEFS

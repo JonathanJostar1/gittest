@@ -10,7 +10,8 @@
  *      INCLUDES
  *********************/
 #include "lv_port_indev.h"
-#include "../../lvgl.h"
+#include "lvgl.h"
+#include "xpt2046_lcd.h"
 
 /*********************
  *      DEFINES
@@ -83,37 +84,7 @@ void lv_port_indev_init(void)
 /*Initialize your touchpad*/
 static void touchpad_init(void)
 {
-    GPIO_InitTypeDef  GPIO_InitStructure;
-
-    /* 开启GPIO时钟 */
-    RCC_APB2PeriphClockCmd ( XPT2046_SPI_GPIO_CLK|XPT2046_PENIRQ_GPIO_CLK, ENABLE );
-
-    /* 模拟SPI GPIO初始化 */          
-    GPIO_InitStructure.GPIO_Pin=XPT2046_SPI_CLK_PIN;
-    GPIO_InitStructure.GPIO_Speed=GPIO_Speed_10MHz ;	  
-    GPIO_InitStructure.GPIO_Mode=GPIO_Mode_Out_PP;
-    GPIO_Init(XPT2046_SPI_CLK_PORT, &GPIO_InitStructure);
-
-    GPIO_InitStructure.GPIO_Pin = XPT2046_SPI_MOSI_PIN;
-    GPIO_Init(XPT2046_SPI_MOSI_PORT, &GPIO_InitStructure);
-
-    GPIO_InitStructure.GPIO_Pin = XPT2046_SPI_MISO_PIN; 
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz ;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;      
-    GPIO_Init(XPT2046_SPI_MISO_PORT, &GPIO_InitStructure);
-
-    GPIO_InitStructure.GPIO_Pin = XPT2046_SPI_CS_PIN; 
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz ;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;      
-    GPIO_Init(XPT2046_SPI_CS_PORT, &GPIO_InitStructure); 
-
-    /* 拉低片选，选择XPT2046 */
-    XPT2046_CS_DISABLE();		
-                                
-    //触摸屏触摸信号指示引脚，不使用中断
-    GPIO_InitStructure.GPIO_Pin = XPT2046_PENIRQ_GPIO_PIN;       
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;	 // 上拉输入
-    GPIO_Init(XPT2046_PENIRQ_GPIO_PORT, &GPIO_InitStructure);
+    XPT2046_Init();
 }
 
 /*Will be called by the library to read the touchpad*/
@@ -123,34 +94,33 @@ static void touchpad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
     static lv_coord_t last_y = 0;
 
     /*Save the pressed coordinates and the state*/
-    if(touchpad_is_pressed()) {
+    if(touchpad_is_pressed()) 
+    {
         touchpad_get_xy(&last_x, &last_y);
         data->state = LV_INDEV_STATE_PR;
+        printf("x: %d, y: %d\r\n", last_x, last_y);
     }
     else {
         data->state = LV_INDEV_STATE_REL;
     }
 
     /*Set the last pressed coordinates*/
-    data->point.x = last_x;
-    data->point.y = last_y;
+    data->point.x = (MY_DISP_HOR_RES - last_x);
+    data->point.y = (MY_DISP_VER_RES - last_y);
 }
 
 /*Return true is the touchpad is pressed*/
 static bool touchpad_is_pressed(void)
 {
     /*Your code comes here*/
-
-    return false;
+    return XPT2046_TouchDetect();
 }
 
 /*Get the x and y coordinates if the touchpad is pressed*/
 static void touchpad_get_xy(lv_coord_t * x, lv_coord_t * y)
 {
     /*Your code comes here*/
-
-    (*x) = 0;
-    (*y) = 0;
+    XPT2046_Get_TouchedPoint(x, y);
 }
 #else /*Enable this file at the top*/
 

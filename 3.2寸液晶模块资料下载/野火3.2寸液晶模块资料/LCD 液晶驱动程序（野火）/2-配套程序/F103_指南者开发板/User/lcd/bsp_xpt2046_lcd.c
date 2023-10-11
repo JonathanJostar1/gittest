@@ -801,8 +801,8 @@ uint8_t XPT2046_TouchDetect(void)
 				else	//等待时间值未达到阈值就为无效电平，当成抖动处理					
 				{
 				    i = 0;
-            touch_state = XPT2046_STATE_RELEASE; 
-						detectResult = TOUCH_NOT_PRESSED;
+            		touch_state = XPT2046_STATE_RELEASE; 
+					detectResult = TOUCH_NOT_PRESSED;
 				}
 		
 			break;
