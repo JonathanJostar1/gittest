@@ -1,22 +1,40 @@
 #ifndef __LED_H
 #define __LED_H	 
 #include "sys.h"
-//////////////////////////////////////////////////////////////////////////////////	 
-//本程序只供学习使用，未经作者许可，不得用于其它任何用途
-//ALIENTEK战舰STM32开发板
-//LED驱动代码	   
-//正点原子@ALIENTEK
-//技术论坛:www.openedv.com
-//修改日期:2012/9/2
-//版本：V1.0
-//版权所有，盗版必究。
-//Copyright(C) 广州市星翼电子科技有限公司 2009-2019
-//All rights reserved									  
-////////////////////////////////////////////////////////////////////////////////// 
-#define LED0 PBout(5)// PB5
-#define LED1 PEout(5)// PE5	
+#include "stm32f10x.h"
 
-void LED_Init(void);//初始化
+/* 定义LED连接的GPIO端口, 用户只需要修改下面的代码即可改变控制的LED引脚 */
+// R-红色
+#define LED1_GPIO_PORT    	GPIOB			              /* GPIO端口 */
+#define LED1_GPIO_CLK 	    RCC_APB2Periph_GPIOB		/* GPIO端口时钟 */
+#define LED1_GPIO_PIN		GPIO_Pin_5			        /* 连接到SCL时钟线的GPIO */
 
-		 				    
+// G-绿色
+#define LED2_GPIO_PORT    	GPIOB			              /* GPIO端口 */
+#define LED2_GPIO_CLK 	    RCC_APB2Periph_GPIOB		/* GPIO端口时钟 */
+#define LED2_GPIO_PIN		GPIO_Pin_0			        /* 连接到SCL时钟线的GPIO */
+
+// B-蓝色
+#define LED3_GPIO_PORT    	GPIOB			            /* GPIO端口 */
+#define LED3_GPIO_CLK 	    RCC_APB2Periph_GPIOB		/* GPIO端口时钟 */
+#define LED3_GPIO_PIN		GPIO_Pin_1			        /* 连接到SCL时钟线的GPIO */
+#define digitalToggle(p,i)  {p->ODR ^=i;}                //输出反转状态
+#define	digitalHi(p,i)		{p->BSRR=i;}	 //输出为高电平		
+#define digitalLo(p,i)		{p->BRR=i;}	 //输出低电平
+/* 定义控制IO的宏 */
+#define LED1_TOGGLE		   digitalToggle(LED1_GPIO_PORT,LED1_GPIO_PIN)
+#define LED1_OFF		   digitalHi(LED1_GPIO_PORT,LED1_GPIO_PIN)
+#define LED1_ON			   digitalLo(LED1_GPIO_PORT,LED1_GPIO_PIN)
+
+#define LED2_TOGGLE		   digitalToggle(LED2_GPIO_PORT,LED2_GPIO_PIN)
+#define LED2_OFF		   digitalHi(LED2_GPIO_PORT,LED2_GPIO_PIN)
+#define LED2_ON			   digitalLo(LED2_GPIO_PORT,LED2_GPIO_PIN)
+
+#define LED3_TOGGLE		   digitalToggle(LED3_GPIO_PORT,LED3_GPIO_PIN)
+#define LED3_OFF		   digitalHi(LED3_GPIO_PORT,LED3_GPIO_PIN)
+#define LED3_ON			   digitalLo(LED3_GPIO_PORT,LED3_GPIO_PIN)
+
+
+void LED_GPIO_Config(void);
+
 #endif

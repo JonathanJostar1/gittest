@@ -96,7 +96,7 @@
 #define configUSE_PREEMPTION					  1
 
 //1使能时间片调度(默认式使能的)
-#define configUSE_TIME_SLICING					1		
+#define configUSE_TIME_SLICING					  1		
 
 /* 某些运行FreeRTOS的硬件有两种方法选择下一个要执行的任务：
  * 通用方法和特定于硬件的方法（以下简称“特殊方法”）。
@@ -128,7 +128,7 @@
  * 			1.使用FlyMcu擦除一下芯片，然后进行下载
  *			STMISP -> 清除芯片(z)
  */
-#define configUSE_TICKLESS_IDLE													0   
+#define configUSE_TICKLESS_IDLE							0   
 
 /*
  * 写入实际的CPU内核时钟频率，也就是CPU指令执行频率，通常称为Fclk
@@ -141,7 +141,7 @@
 #define configTICK_RATE_HZ                          (( TickType_t )1000)
 
 //可使用的最大优先级
-#define configMAX_PRIORITIES                        (32)
+#define configMAX_PRIORITIES                        (10)
 
 //空闲任务使用的堆栈大小
 #define configMINIMAL_STACK_SIZE                    ((unsigned short)128)
@@ -162,10 +162,10 @@
 #define configUSE_TASK_NOTIFICATIONS                1   
 
 //使用互斥信号量
-#define configUSE_MUTEXES                           0    
+#define configUSE_MUTEXES                           1    
 
 //使用递归互斥信号量                                            
-#define configUSE_RECURSIVE_MUTEXES                 0   
+#define configUSE_RECURSIVE_MUTEXES                 1   
 
 //为1时使用计数信号量
 #define configUSE_COUNTING_SEMAPHORES               0
@@ -184,7 +184,7 @@
 //支持静态内存
 #define configSUPPORT_STATIC_ALLOCATION             0   
 //系统所有总的堆大小
-#define configTOTAL_HEAP_SIZE                       ((size_t)(36*1024))    
+#define configTOTAL_HEAP_SIZE                       ((size_t)(20*1024))    
 
 
 /***************************************************************
@@ -252,13 +252,13 @@
                 FreeRTOS与软件定时器有关的配置选项      
 **********************************************************************/
  //启用软件定时器
-#define configUSE_TIMERS                        0                              
+#define configUSE_TIMERS                        1                              
 //软件定时器优先级
-#define configTIMER_TASK_PRIORITY               (configMAX_PRIORITIES-1)        
+#define configTIMER_TASK_PRIORITY               (configMAX_PRIORITIES - 1)        
 //软件定时器队列长度
 #define configTIMER_QUEUE_LENGTH                10                               
 //软件定时器任务堆栈大小
-#define configTIMER_TASK_STACK_DEPTH            (configMINIMAL_STACK_SIZE*2)    
+#define configTIMER_TASK_STACK_DEPTH            (configMINIMAL_STACK_SIZE * 2)    
 
 /************************************************************
             FreeRTOS可选函数配置选项                                                     
@@ -300,8 +300,9 @@
 /****************************************************************
             FreeRTOS与中断服务函数有关的配置选项                         
 ****************************************************************/
-//#define xPortPendSVHandler 	PendSV_Handler
-//#define vPortSVCHandler 	SVC_Handler
+#define xPortPendSVHandler 	    PendSV_Handler
+#define vPortSVCHandler 	    SVC_Handler
+// #define xPortSysTickHandler     SysTick_Handler
 
 
 /* 以下为使用Percepio Tracealyzer需要的东西，不需要时将 configUSE_TRACE_FACILITY 定义为 0 */

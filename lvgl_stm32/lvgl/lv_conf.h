@@ -41,7 +41,7 @@
 #define LV_USE_BUILTIN_MALLOC 1
 #if LV_USE_BUILTIN_MALLOC
     /*Size of the memory available for `lv_malloc()` in bytes (>= 2kB)*/
-    #define LV_MEM_SIZE (32U * 1024U)          /*[bytes]*/
+    #define LV_MEM_SIZE (25U * 1024U)          /*[bytes]*/
 
     /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
     #define LV_MEM_ADR 0     /*0: unused*/
@@ -101,7 +101,7 @@
 
     /*Enable complex draw engine.
      *Required to draw shadow, gradient, rounded corners, circles, arc, skew lines, image transformations or any masks*/
-    #define LV_DRAW_SW_COMPLEX 1
+    #define LV_DRAW_SW_COMPLEX 0
 
     /* If a widget has `style_opa < 255` (not `bg_opa`, `text_opa` etc) or not NORMAL blend mode
      * it is buffered into a "simple" layer before rendering. The widget can be buffered in smaller chunks.
@@ -358,7 +358,7 @@
 #define LV_FONT_MONTSERRAT_22 0
 #define LV_FONT_MONTSERRAT_24 0
 #define LV_FONT_MONTSERRAT_26 0
-#define LV_FONT_MONTSERRAT_28 0
+#define LV_FONT_MONTSERRAT_28 1
 #define LV_FONT_MONTSERRAT_30 0
 #define LV_FONT_MONTSERRAT_32 0
 #define LV_FONT_MONTSERRAT_34 0

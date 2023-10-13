@@ -28,149 +28,284 @@
 #include "examples/porting/lv_port_indev.h"
 #include "examples/lv_examples.h"
 #include "xpt2046_lcd.h"
+#include "FreeRTOS.h"
+#include "FreeRTOSConfig.h"
+#include "task.h"
+#include "config.h"
+#include "calculate.h"
+#include "led.h"
+#include "timer.h"
 
-
-void timer3_init(void)
+typedef struct
 {
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-    TIM_TimeBaseInitTypeDef TIM_InitStruct;
-    TIM_InitStruct.TIM_Prescaler = 71; // 设置时钟分频，使计数器频率为1kHz
-    TIM_InitStruct.TIM_CounterMode = TIM_CounterMode_Up; // 向上计数模式
-    TIM_InitStruct.TIM_Period = 1000 - 1; // 设置自动重装载寄存器ARR以获得1毫秒的中断
-    TIM_InitStruct.TIM_ClockDivision = TIM_CKD_DIV1;
-    TIM_InitStruct.TIM_RepetitionCounter = 0;
-    TIM_TimeBaseInit(TIM3, &TIM_InitStruct);
-
+    lv_obj_t *scr;
+    lv_obj_t *equal_btn, *dot_btn, *btn_sub, *btn_div, *btn_mult, *btn_plus, *btn_C, *btn_delete;
+    lv_obj_t *eq_label, *dot_label, *label_sub, *label_div, *label_mult, *label_plus, *label_C, *label_delete; 
     
-    TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+    lv_obj_t *btn_0, *btn_1, *btn_2, *btn_3, *btn_4, *btn_5, *btn_6, *btn_7, *btn_8, *btn_9;
+    lv_obj_t *label_0, *label_1, *label_2, *label_3, *label_4, *label_5, *label_6, *label_7, *label_8, *label_9;
     
-    NVIC_InitTypeDef NVIC_InitStruct;
-    NVIC_InitStruct.NVIC_IRQChannel = TIM3_IRQn; // TIM3更新中断
-    NVIC_InitStruct.NVIC_IRQChannelPreemptionPriority = 0; // 设置中断优先级
-    NVIC_InitStruct.NVIC_IRQChannelSubPriority = 0;
-    NVIC_InitStruct.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStruct);
-
-    // 启用全局中断
-    __enable_irq();
-
+    lv_obj_t *label_result;
+    lv_obj_t *label_input;
     
-    TIM_Cmd(TIM3, ENABLE);
-}
+    uint16_t btn_size_x;
+    uint16_t btn_size_y;
+    uint16_t btn_pos_x;  // 第一个按钮位置
+    uint16_t btn_pos_y;  // 第一个按钮位置
+}my_lv_obj_t;
 
-/* 定义LED连接的GPIO端口, 用户只需要修改下面的代码即可改变控制的LED引脚 */
-// R-红色
-#define LED1_GPIO_PORT    	GPIOB			              /* GPIO端口 */
-#define LED1_GPIO_CLK 	    RCC_APB2Periph_GPIOB		/* GPIO端口时钟 */
-#define LED1_GPIO_PIN		GPIO_Pin_5			        /* 连接到SCL时钟线的GPIO */
+static my_lv_obj_t my_obj = {
+    .btn_size_x = 80,
+    .btn_size_y = 35,
+    .btn_pos_x = 0,
+};
 
-// G-绿色
-#define LED2_GPIO_PORT    	GPIOB			              /* GPIO端口 */
-#define LED2_GPIO_CLK 	    RCC_APB2Periph_GPIOB		/* GPIO端口时钟 */
-#define LED2_GPIO_PIN		GPIO_Pin_0			        /* 连接到SCL时钟线的GPIO */
-
-// B-蓝色
-#define LED3_GPIO_PORT    	GPIOB			            /* GPIO端口 */
-#define LED3_GPIO_CLK 	    RCC_APB2Periph_GPIOB		/* GPIO端口时钟 */
-#define LED3_GPIO_PIN		GPIO_Pin_1			        /* 连接到SCL时钟线的GPIO */
-#define digitalToggle(p,i)  {p->ODR ^=i;}                //输出反转状态
-#define	digitalHi(p,i)		{p->BSRR=i;}	 //输出为高电平		
-#define digitalLo(p,i)		{p->BRR=i;}	 //输出低电平
-/* 定义控制IO的宏 */
-#define LED1_TOGGLE		 digitalToggle(LED1_GPIO_PORT,LED1_GPIO_PIN)
-#define LED1_OFF		   digitalHi(LED1_GPIO_PORT,LED1_GPIO_PIN)
-#define LED1_ON			   digitalLo(LED1_GPIO_PORT,LED1_GPIO_PIN)
-
-void LED_GPIO_Config(void)
-{		
-		/*定义一个GPIO_InitTypeDef类型的结构体*/
-		GPIO_InitTypeDef GPIO_InitStructure;
-
-		/*开启LED相关的GPIO外设时钟*/
-		RCC_APB2PeriphClockCmd( LED1_GPIO_CLK | LED2_GPIO_CLK | LED3_GPIO_CLK, ENABLE);
-		/*选择要控制的GPIO引脚*/
-		GPIO_InitStructure.GPIO_Pin = LED1_GPIO_PIN;	
-
-		/*设置引脚模式为通用推挽输出*/
-		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;   
-
-		/*设置引脚速率为50MHz */   
-		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; 
-
-		/*调用库函数，初始化GPIO*/
-		GPIO_Init(LED1_GPIO_PORT, &GPIO_InitStructure);	
-		
-		/*选择要控制的GPIO引脚*/
-		GPIO_InitStructure.GPIO_Pin = LED2_GPIO_PIN;
-
-		/*调用库函数，初始化GPIO*/
-		GPIO_Init(LED2_GPIO_PORT, &GPIO_InitStructure);
-		
-		/*选择要控制的GPIO引脚*/
-		GPIO_InitStructure.GPIO_Pin = LED3_GPIO_PIN;
-
-		/*调用库函数，初始化GPIOF*/
-		GPIO_Init(LED3_GPIO_PORT, &GPIO_InitStructure);
-
-		/* 关闭所有led灯	*/
-		GPIO_SetBits(LED1_GPIO_PORT, LED1_GPIO_PIN);
-		
-		/* 关闭所有led灯	*/
-		GPIO_SetBits(LED2_GPIO_PORT, LED2_GPIO_PIN);	 
-    
-    /* 关闭所有led灯	*/
-		GPIO_SetBits(LED3_GPIO_PORT, LED3_GPIO_PIN);
-}
-
-static void event_handler(lv_event_t * e)
+static void input_handle(char *operate)
 {
-    lv_event_code_t code = lv_event_get_code(e);
-
-    if(code == LV_EVENT_CLICKED) {
-        LV_LOG_USER("Clicked\r\n");
+    static uint8_t is_get_result = 0;
+    if(operate == NULL || strlen(operate) == 0)
+    {
+         return;
     }
-    else if(code == LV_EVENT_VALUE_CHANGED) {
-        LV_LOG_USER("Toggled\r\n");
+    
+    if(is_get_result)
+    {
+         lv_label_set_text(my_obj.label_input, " ");
+         is_get_result = 0;
+    }
+    
+    if(strncmp(operate, "C", 2) == 0)
+    {
+        lv_label_set_text(my_obj.label_result, " ");
+        lv_label_set_text(my_obj.label_input, " ");
+        return;
+    }
+    
+    if(strncmp(operate, "=", 2) == 0)
+    {
+        char *expression = lv_label_get_text(my_obj.label_input);
+        int result = evaluateInfixExpression(expression);
+        lv_label_set_text_fmt(my_obj.label_result, "%d", result);
+        is_get_result = 1;
+        return;
+    }
+    
+    if(strncmp(operate, "<", 2) == 0)
+    {
+        char *expression = lv_label_get_text(my_obj.label_input);
+        if(strlen(expression) > 0)
+        {
+            char short_express[64] = {0};
+            strncpy(short_express, expression, strlen(expression) - 1);
+            lv_label_set_text_fmt(my_obj.label_input, "%s", short_express); 
+        }
+        return;
+    }
+    
+    /* 显示正常算式 */
+    char *expression = lv_label_get_text(my_obj.label_input);
+    if(strlen(expression) <= 18 && strlen(expression) > 0)
+    {
+        char output[64] = {0};
+        snprintf(output, sizeof(output), "%s%s", expression, operate);
+        printf("%s\r\n", output);
+        lv_label_set_text_fmt(my_obj.label_input, "%s", output); 
+    }
+
+}
+
+
+static void event_handler(lv_event_t * event)
+{
+    lv_event_code_t code = lv_event_get_code(event);
+    
+    if(code == LV_EVENT_CLICKED) 
+    {
+        lv_obj_t *obj = lv_event_get_target(event);
+        lv_obj_t *btn_label = lv_obj_get_child(obj, 0);
+        char *btn_text = lv_label_get_text(btn_label);
+        printf("%s Clicked\r\n", btn_text);
+        
+        input_handle(btn_text);
     }
 }
 
-/**
-  * @brief  Main program
-  * @param  None
-  * @retval None
-  */
-int main(void)
+void lvgl_task(void *pvParameters)
 {
-    delay_init();
-    uart_init(115200);
-    
-    LED_GPIO_Config();
+    my_obj.btn_pos_y = MY_DISP_HOR_RES - my_obj.btn_size_y * 6;
     
     timer3_init();
     lv_init();
+    
+    #if 1
     lv_port_disp_init();
-    lv_port_indev_init();
+    lv_port_indev_init();    
    
-    lv_obj_t *scr = lv_obj_create(NULL);
-    lv_obj_t *btn1 = lv_btn_create(scr);
-    lv_obj_set_size(btn1, 100, 40);
-    lv_obj_set_pos(btn1, 0, 0);
-    // lv_obj_set_align(btn1, LV_ALIGN_CENTER);
-    lv_obj_add_event_cb(btn1, event_handler, LV_EVENT_ALL, NULL);
-    lv_obj_add_flag(btn1, LV_OBJ_FLAG_CHECKABLE);
+    my_obj.scr = lv_obj_create(NULL);                                     
+    my_obj.equal_btn = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.equal_btn, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.equal_btn, my_obj.btn_pos_x + my_obj.btn_size_x * 2, my_obj.btn_pos_y + my_obj.btn_size_y * 5);
+    lv_obj_add_event_cb(my_obj.equal_btn, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.eq_label = lv_label_create(my_obj.equal_btn);
+    lv_label_set_text(my_obj.eq_label, "=");
+    lv_obj_align(my_obj.eq_label, LV_ALIGN_CENTER, 0, 0);
     
+    my_obj.btn_0 = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_0, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_0, my_obj.btn_pos_x + my_obj.btn_size_x * 1, my_obj.btn_pos_y + my_obj.btn_size_y * 5);
+    lv_obj_add_event_cb(my_obj.btn_0, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_0 = lv_label_create(my_obj.btn_0);
+    lv_label_set_text(my_obj.label_0, "0");
+    lv_obj_align(my_obj.label_0, LV_ALIGN_CENTER, 0, 0);
     
-    lv_obj_t *label = lv_label_create(btn1);
-    lv_label_set_text(label, "Toggle");
-    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+    my_obj.dot_btn = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.dot_btn, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.dot_btn, my_obj.btn_pos_x + my_obj.btn_size_x * 0, my_obj.btn_pos_y + my_obj.btn_size_y * 5);
+    lv_obj_add_event_cb(my_obj.dot_btn, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.dot_label = lv_label_create(my_obj.dot_btn);
+    lv_label_set_text(my_obj.dot_label, ".");
+    lv_obj_align(my_obj.dot_label, LV_ALIGN_CENTER, 0, 0);
     
-//    lv_obj_t *label1 = lv_label_create(scr);
-//    lv_label_set_text(label1, "0");
-//    lv_obj_set_pos(label1, 0, 0);
-//    lv_obj_align(label1, LV_ALIGN_CENTER, 0, 0);
-    lv_scr_load(scr);  
+
+    my_obj.btn_3 = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_3, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_3, my_obj.btn_pos_x + my_obj.btn_size_x * 2, my_obj.btn_pos_y + my_obj.btn_size_y * 4);
+    lv_obj_add_event_cb(my_obj.btn_3, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_3 = lv_label_create(my_obj.btn_3);
+    lv_label_set_text(my_obj.label_3, "3");
+    lv_obj_align(my_obj.label_3, LV_ALIGN_CENTER, 0, 0);
     
-    LED1_ON;
+    my_obj.btn_2 = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_2, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_2, my_obj.btn_pos_x + my_obj.btn_size_x * 1, my_obj.btn_pos_y + my_obj.btn_size_y * 4);;
+    lv_obj_add_event_cb(my_obj.btn_2, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_2 = lv_label_create(my_obj.btn_2);
+    lv_label_set_text(my_obj.label_2, "2");
+    lv_obj_align(my_obj.label_2, LV_ALIGN_CENTER, 0, 0);
+    
+    my_obj.btn_1 = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_1, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_1, my_obj.btn_pos_x + my_obj.btn_size_x * 0, my_obj.btn_pos_y + my_obj.btn_size_y * 4);
+    lv_obj_add_event_cb(my_obj.btn_1, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_1 = lv_label_create(my_obj.btn_1);
+    lv_label_set_text(my_obj.label_1, "1");
+    lv_obj_align(my_obj.label_1, LV_ALIGN_CENTER, 0, 0);
+    
+    my_obj.btn_6 = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_6, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_6, my_obj.btn_pos_x + my_obj.btn_size_x * 2, my_obj.btn_pos_y + my_obj.btn_size_y * 3);
+    lv_obj_add_event_cb(my_obj.btn_6, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_6 = lv_label_create(my_obj.btn_6);
+    lv_label_set_text(my_obj.label_6, "6");
+    lv_obj_align(my_obj.label_6, LV_ALIGN_CENTER, 0, 0);
+    
+    my_obj.btn_5 = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_5, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_5, my_obj.btn_pos_x + my_obj.btn_size_x * 1, my_obj.btn_pos_y + my_obj.btn_size_y * 3);
+    lv_obj_add_event_cb(my_obj.btn_5, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_5 = lv_label_create(my_obj.btn_5);
+    lv_label_set_text(my_obj.label_5, "5");
+    lv_obj_align(my_obj.label_5, LV_ALIGN_CENTER, 0, 0);
+    
+    my_obj.btn_4 = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_4, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_4, my_obj.btn_pos_x + my_obj.btn_size_x * 0, my_obj.btn_pos_y + my_obj.btn_size_y * 3);
+    lv_obj_add_event_cb(my_obj.btn_4, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_4 = lv_label_create(my_obj.btn_4);
+    lv_label_set_text(my_obj.label_4, "4");
+    lv_obj_align(my_obj.label_4, LV_ALIGN_CENTER, 0, 0);
+    
+    my_obj.btn_9 = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_9, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_9, my_obj.btn_pos_x + my_obj.btn_size_x * 2, my_obj.btn_pos_y + my_obj.btn_size_y * 2);
+    lv_obj_add_event_cb(my_obj.btn_9, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_9 = lv_label_create(my_obj.btn_9);
+    lv_label_set_text(my_obj.label_9, "9");
+    lv_obj_align(my_obj.label_9, LV_ALIGN_CENTER, 0, 0);
+    
+    my_obj.btn_8 = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_8, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_8, my_obj.btn_pos_x + my_obj.btn_size_x * 1, my_obj.btn_pos_y + my_obj.btn_size_y * 2);
+    lv_obj_add_event_cb(my_obj.btn_8, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_8 = lv_label_create(my_obj.btn_8);
+    lv_label_set_text(my_obj.label_8, "8");
+    lv_obj_align(my_obj.label_8, LV_ALIGN_CENTER, 0, 0);
+    
+    my_obj.btn_7 = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_7, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_7, my_obj.btn_pos_x + my_obj.btn_size_x * 0, my_obj.btn_pos_y + my_obj.btn_size_y * 2);
+    lv_obj_add_event_cb(my_obj.btn_7, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_7 = lv_label_create(my_obj.btn_7);
+    lv_label_set_text(my_obj.label_7, "7");
+    lv_obj_align(my_obj.label_7, LV_ALIGN_CENTER, 0, 0);
+    
+    my_obj.btn_sub = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_sub, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_sub, my_obj.btn_pos_x + my_obj.btn_size_x * 0, my_obj.btn_pos_y + my_obj.btn_size_y * 1);
+    lv_obj_add_event_cb(my_obj.btn_sub, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_sub = lv_label_create(my_obj.btn_sub);
+    lv_label_set_text(my_obj.label_sub, "-");
+    lv_obj_align(my_obj.label_sub, LV_ALIGN_CENTER, 0, 0);
+    
+    my_obj.btn_div = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_div, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_div, my_obj.btn_pos_x + my_obj.btn_size_x * 1, my_obj.btn_pos_y + my_obj.btn_size_y * 1);
+    lv_obj_add_event_cb(my_obj.btn_div, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_div = lv_label_create(my_obj.btn_div);
+    lv_label_set_text(my_obj.label_div, "/");
+    lv_obj_align(my_obj.label_div, LV_ALIGN_CENTER, 0, 0);
+    
+    my_obj.btn_mult = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_mult, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_mult, my_obj.btn_pos_x + my_obj.btn_size_x * 2, my_obj.btn_pos_y + my_obj.btn_size_y * 1);
+    lv_obj_add_event_cb(my_obj.btn_mult, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_mult = lv_label_create(my_obj.btn_mult);
+    lv_label_set_text(my_obj.label_mult, "*");
+    lv_obj_align(my_obj.label_mult, LV_ALIGN_CENTER, 0, 0);
+
+    my_obj.btn_plus = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_plus, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_plus, my_obj.btn_pos_x + my_obj.btn_size_x * 0, my_obj.btn_pos_y + my_obj.btn_size_y * 0);
+    lv_obj_add_event_cb(my_obj.btn_plus, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_plus = lv_label_create(my_obj.btn_plus);
+    lv_label_set_text(my_obj.label_plus, "+");
+    lv_obj_align(my_obj.label_plus, LV_ALIGN_CENTER, 0, 0);
+    
+    my_obj.btn_C = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_C, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_C, my_obj.btn_pos_x + my_obj.btn_size_x * 1, my_obj.btn_pos_y + my_obj.btn_size_y * 0);
+    lv_obj_add_event_cb(my_obj.btn_C, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_C = lv_label_create(my_obj.btn_C);
+    lv_label_set_text(my_obj.label_C, "C");
+    lv_obj_align(my_obj.label_C, LV_ALIGN_CENTER, 0, 0);
+    
+    my_obj.btn_delete = lv_btn_create(my_obj.scr);
+    lv_obj_set_size(my_obj.btn_delete, my_obj.btn_size_x, my_obj.btn_size_y);
+    lv_obj_set_pos(my_obj.btn_delete, my_obj.btn_pos_x + my_obj.btn_size_x * 2, my_obj.btn_pos_y + my_obj.btn_size_y * 0);
+    lv_obj_add_event_cb(my_obj.btn_delete, event_handler, LV_EVENT_ALL, NULL);
+    my_obj.label_delete = lv_label_create(my_obj.btn_delete);
+    lv_label_set_text(my_obj.label_delete, "<");
+    lv_obj_align(my_obj.label_delete, LV_ALIGN_CENTER, 0, 0);
+
+    /* 结果输出 */
+    my_obj.label_result = lv_label_create(my_obj.scr);
+    lv_obj_set_size(my_obj.label_result, 240, 30);
+    lv_obj_set_pos(my_obj.label_result, 0, 15);
+    lv_label_set_text(my_obj.label_result, "123456789");
+    lv_label_set_long_mode(my_obj.label_result, LV_LABEL_LONG_WRAP);
+    lv_obj_set_style_text_align(my_obj.label_result, LV_TEXT_ALIGN_RIGHT, 0);
+    lv_obj_set_style_text_font(my_obj.label_result, &lv_font_montserrat_28, 0);
+    
+    /* 算数输入 */
+    my_obj.label_input = lv_label_create(my_obj.scr);
+    lv_obj_set_size(my_obj.label_input, 240, 25);
+    lv_obj_set_pos(my_obj.label_input, 0, 75);
+    lv_label_set_text(my_obj.label_input, "987654321");
+    lv_label_set_long_mode(my_obj.label_input, LV_LABEL_LONG_WRAP);
+    lv_obj_set_style_text_align(my_obj.label_input, LV_TEXT_ALIGN_RIGHT, 0);
+
+    lv_scr_load(my_obj.scr);
+    #endif
     while(1)
     {   
         lv_timer_handler();
@@ -185,6 +320,39 @@ int main(void)
              LED1_OFF;
         }
     }
+}
+
+static TaskHandle_t  led_task_handle;
+
+void led_task(void *pvParameters)
+{
+     while(1)
+     {
+         LED1_ON;
+         vTaskDelay(pdMS_TO_TICKS(1000));
+         LED1_OFF;
+         vTaskDelay(pdMS_TO_TICKS(1000));
+     }
+}
+
+/**
+  * @brief  Main program
+  * @param  None
+  * @retval None
+  */
+int main(void)
+{
+    delay_init();
+    uart_init(115200);
+    LED_GPIO_Config();   
+ 
+    // lvgl_task(NULL);
+    
+	xTaskCreate(lvgl_task, "led_task", 4*1024, NULL, 5, &led_task_handle); 
+    
+    vTaskStartScheduler(); 
+
+    return 0;
 }
 
 /**

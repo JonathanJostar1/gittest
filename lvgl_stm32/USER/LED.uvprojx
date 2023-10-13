@@ -339,7 +339,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F10X_MD</Define>
               <Undefine></Undefine>
-              <IncludePath>..\USER;..\CORE;..\STM32F10x_FWLib\inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LED;..\HARDWARE\FLASH;..\HARDWARE\ADS1256_Driver;..\HARDWARE\SPI;..\Utilities\STM32_EVAL;..\Utilities\STM32_EVAL\Common;..\Utilities\STM32_EVAL\STM3210E_EVAL;..\FreeRTOS\Port\RVDS\ARM_CM3;..\FreeRTOS\Port\MemMang;..\FreeRTOS\Source;..\FreeRTOS\Include;..\lvgl;..\lvgl\src;..\lvgl\examples;..\HARDWARE\LCD</IncludePath>
+              <IncludePath>..\USER;..\CORE;..\STM32F10x_FWLib\inc;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\HARDWARE\LED;..\HARDWARE\FLASH;..\HARDWARE\ADS1256_Driver;..\HARDWARE\SPI;..\Utilities\STM32_EVAL;..\Utilities\STM32_EVAL\Common;..\Utilities\STM32_EVAL\STM3210E_EVAL;..\FreeRTOS\Port\RVDS\ARM_CM3;..\FreeRTOS\Port\MemMang;..\FreeRTOS\Source;..\FreeRTOS\Include;..\lvgl;..\lvgl\src;..\lvgl\examples;..\HARDWARE\LCD;..\Calculation;..\Common;..\HARDWARE</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -403,6 +403,26 @@
               <FileType>5</FileType>
               <FilePath>.\FreeRTOSConfig.h</FilePath>
             </File>
+            <File>
+              <FileName>config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\config.h</FilePath>
+            </File>
+            <File>
+              <FileName>calculate.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Calculation\calculate.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>COMMON</GroupName>
+          <Files>
+            <File>
+              <FileName>cmn_stack.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Common\cmn_stack.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -433,6 +453,11 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\FLASH\spi_flash.c</FilePath>
             </File>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\timer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -452,11 +477,6 @@
               <FileName>delay.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\SYSTEM\delay\delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\SYSTEM\delay\delay.h</FilePath>
             </File>
           </Files>
         </Group>
@@ -2221,16 +2241,6 @@
               <FileName>lv_port_indev.h</FileName>
               <FileType>5</FileType>
               <FilePath>..\lvgl\examples\porting\lv_port_indev.h</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Lvgl/example</GroupName>
-          <Files>
-            <File>
-              <FileName>lv_example_colorwheel_1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\lvgl\examples\widgets\colorwheel\lv_example_colorwheel_1.c</FilePath>
             </File>
           </Files>
         </Group>

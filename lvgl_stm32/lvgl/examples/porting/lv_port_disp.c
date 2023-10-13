@@ -121,7 +121,7 @@ void lv_port_disp_init(void)
     disp_drv.draw_buf = &draw_buf_dsc_1;
     
     disp_drv.sw_rotate = 1;   // add for rotation
-    disp_drv.rotated = LV_DISP_ROT_180;   // add for rotation
+    disp_drv.rotated = LV_DISP_ROT_270;   // add for rotation
 
     /*Required for Example 3)*/
     //disp_drv.full_refresh = 1;
