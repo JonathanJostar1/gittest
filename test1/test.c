@@ -15,7 +15,7 @@ int fun_sub(int x, int y);
 int fun_mul(int x, int y);
 int fun_div(int x, int y);
  
-/* 初始化数组 */
+/* 初�?�化数组 */
 CALC_STRUCT fun_array[4] = {{fun_add, '+'},
 			    {fun_sub, '-'},
 			    {fun_mul, '*'},
@@ -30,7 +30,7 @@ void method1(int data_a, int data_b, int flag)
 	{
 		case 1:
 		{
-			ret = fun_add(data_a, data_b);  //传入函数进行计算
+			ret = fun_add(data_a, data_b);  //传入函数进�?��?�算
 			flag = '+';                     //获取符号
 			break;
 		}
@@ -54,7 +54,7 @@ void method1(int data_a, int data_b, int flag)
 		}
 		default:
 		{
-                        /* 错误的情况 */
+                        /* 错�??的情�? */
 			printf("Symbol input error.");
 			return;
 		}
@@ -69,7 +69,7 @@ void method2(int data_a, int data_b, int flag)
 	int ret;
 	if ((flag < 1) || (flag > 4))
 	{
-                /* 错误的情况 */
+                /* 错�??的情�? */
 		printf("Symbol input error.");
 		return;
 	}
@@ -85,28 +85,28 @@ void main(void)
 	int a = 8;
 	int b = 4;
 	
-	/* 总共有4中计算方法，输入1 2 3 4 选择 */
+	/* 总共�?4�?计算方法，输�?1 2 3 4 选择 */
     printf("Symbol = ");
 	scanf("%d", &flag);
-	method1(a, b, flag);  //实现方法一 高圈复杂度
-	method2(a, b, flag);  //实现方法二 低圈复杂
+	method1(a, b, flag);  //实现方法一 高圈复杂�?
+	method2(a, b, flag);  //实现方法�? 低圈复杂
 
     system("pause");
 }
  
-/* 加函数 */
+/* 加函�? */
 int fun_add(int x, int y)
 {	
     return x + y;
 }
  
-/* 减函数 */
+/* 减函�? */
 int fun_sub(int x, int y)
 {
     return x - y;
 }
  
-/* 乘函数 */
+/* 乘函�? */
 int fun_mul(int x, int y)
 {
     return x * y;

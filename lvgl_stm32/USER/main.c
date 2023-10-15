@@ -322,18 +322,7 @@ void lvgl_task(void *pvParameters)
     }
 }
 
-static TaskHandle_t  led_task_handle;
-
-void led_task(void *pvParameters)
-{
-     while(1)
-     {
-         LED1_ON;
-         vTaskDelay(pdMS_TO_TICKS(1000));
-         LED1_OFF;
-         vTaskDelay(pdMS_TO_TICKS(1000));
-     }
-}
+static TaskHandle_t  lvgl_task_handle;
 
 /**
   * @brief  Main program
@@ -348,7 +337,7 @@ int main(void)
  
     // lvgl_task(NULL);
     
-	xTaskCreate(lvgl_task, "led_task", 4*1024, NULL, 5, &led_task_handle); 
+	xTaskCreate(lvgl_task, "lvgl_task", 4*1024, NULL, 5, &lvgl_task_handle); 
     
     vTaskStartScheduler(); 
 

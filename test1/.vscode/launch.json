@@ -34,8 +34,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/L/Desktop/code/test1",
-      "program": "c:/Users/L/Desktop/code/test1/build/Debug/outDebug",
+      "cwd": "c:/Users/L/Desktop/gittest/test1",
+      "program": "c:/Users/L/Desktop/gittest/test1/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
