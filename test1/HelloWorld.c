@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "ringbuf.h"
 
 void max_min(int a[], int n, int *max, int *min)
 {
@@ -26,7 +27,7 @@ int main()
 
     char *str1 = "abcadsadasdasdadadasds";
     printf("str1 = %d, len = %d\n", sizeof(str1), strlen(str1));
-
+    printf_test();
     system("pause");
 
     return (0);

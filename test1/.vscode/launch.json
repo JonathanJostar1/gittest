@@ -12,7 +12,7 @@
       "environment": [],
       "externalConsole": true,
       "MIMode": "gdb",
-      "miDebuggerPath": "C:\\Program Files (x86)\\mingw64\\bin\\gdb.exe",
+      "miDebuggerPath": "E:\\mingw64\\bin\\gdb.exe",
       "setupCommands": [
         {
           "description": "为 gdb 启用整齐打印",
@@ -34,8 +34,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/L/Desktop/gittest/test1",
-      "program": "c:/Users/L/Desktop/gittest/test1/build/Debug/outDebug",
+      "cwd": "e:/Documents/Desktop/gittest/test1",
+      "program": "e:/Documents/Desktop/gittest/test1/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
